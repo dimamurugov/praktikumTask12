@@ -3,22 +3,29 @@ const fs = require('fs').promises;
 const path = require('path');
 
 routerusers.get('/users', (req, res) => {
-  fs.readFile('data/user.json', 'utf-8')
+  fs.readFile(path.join(__dirname, '../data/user.json'), 'utf-8')
     .then((users) => {
-      users = JSON.parse(users);
-      res.status(200).json(users);
+      let massUsers = users;
+      massUsers = JSON.parse(massUsers);
+      res.status(200).json(massUsers);
     })
     .catch(() => res.status(500).json({ message: 'Ошибка при чтении файла' }));
 });
 
 routerusers.get('/users/:id', (req, res) => {
-  fs.readFile(path.join('data/user.json'), 'utf-8')
+  fs.readFile(path.join(__dirname, '../data/user.json'), 'utf-8')
     .then((users) => {
+      let massUsers = users;
+      massUsers = JSON.parse(massUsers);
+
       function findPerson(id) {
-        return users.find((item) => item._id === id);
+        /* он ругается на подчёркивания в "_id" а это имя свойства в объекте, который
+        я изменять не могу, поэтому я игнорировал это правило в этом месте */
+
+        // eslint-disable-next-line no-underscore-dangle
+        return massUsers.find((item) => item._id === id);
       }
 
-      users = JSON.parse(users);
       if (!findPerson(req.params.id)) {
         res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
